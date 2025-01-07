@@ -4,6 +4,9 @@
     currentVideoBookmarks = [];
   const currentVideoData = {};
   let bookmarkTitle = '';
+  // const url='http://localhost:10000'
+  const url='https://yt-timestamp.onrender.com'
+  console.log('url',url)
   let timerId=0
   // listner for all emit messages
   chrome.runtime.onMessage.addListener(async (obj, sender, response) => {
@@ -13,8 +16,8 @@
       currentVideo = videoId;
       isTitlePause = settings.isTitlePause;
       currentVideoData.id = videoId;
-      
-  
+      addSnippetToVideoData(currentVideoData)
+
       newVideoLoaded();
     } else if (type === 'PLAY') {
       youtubePlayer.currentTime = value;
@@ -39,21 +42,13 @@
 
   const setValueToStorage = async(value, key) => {
     await chrome.storage.sync.set({ [key]: JSON.stringify(value) });
-    console.log('key',key)
     const data=await chrome.storage.sync.get()
-    // console.log('predata',data[key])
-    // const bookmarks=JSON.parse(data).bookmarks
-    console.log('got data',data)
-    //http://localhost:10000
-    const res=await fetch("https://yt-timestamp.onrender.com/app/hook",{
+    const res=await fetch(`${url}/app/hook`,{
       method:'post',
       headers:{'content-type':'application/json'},
       body:JSON.stringify(data)
   })
-      const resData=await res.json()
-      console.log('resData',resData)
-  
-
+      await res.json()  
   };
 
   // Methods
@@ -66,7 +61,7 @@
       return data;
     } catch (error) {
       console.log('context validate',error.message);
-      //sendReloadSignal();
+      sendReloadSignal();
     }
   };
 
@@ -120,7 +115,7 @@
       isTitlePause ? addBookmark() : openModal();
     } catch (error) {
       console.log('addbookmark error',error.message);
-      // sendReloadSignal();
+      sendReloadSignal();
     }
   };
 
@@ -135,13 +130,14 @@
         bookmarkBtn.src = addbookmarkBtnSrc;
       }, 1000);
     }
-    const title=document.getElementById('above-the-fold').querySelector('yt-formatted-string').textContent
-    // const channelName=document.getElementById('text').querySelector('a').getAttribute('href')
-    const channelName=document.getElementById('channel-name').querySelector('a').getAttribute('href')
-      const url=location.href
-      const details=document.getElementById('expander').querySelector('yt-attributed-string span').textContent
-      console.log('trying title',currentVideoData.channelName)
-      console.log('got current video data',currentVideoData)
+    
+    // const title=document.getElementById('above-the-fold').querySelector('yt-formatted-string').textContent
+    // // const channelName=document.getElementById('text').querySelector('a').getAttribute('href')
+    // const channelName=document.getElementById('channel-name').querySelector('a').getAttribute('href')
+    //   const url=location.href
+    //   const details=document.getElementById('expander').querySelector('yt-attributed-string span').textContent
+    //   console.log('trying title',currentVideoData.channelName)
+    //   console.log('got current video data',currentVideoData)
 
     const currentTime = youtubePlayer.currentTime;
     const newBookmark = {
@@ -149,11 +145,8 @@
       desc:
         bookmarkTitle != ''
           ? bookmarkTitle
-          : `Bookmark at ${getTime(currentTime)}`,
-      title,
-      channelName,
-      url,
-      details
+          : `Bookmark at ${getTime(currentTime)}`
+      
     };
     // fetch latest bookmarks
     const data = await fetchCurrentVideoData();
@@ -254,7 +247,23 @@
   const sendReloadSignal = () => {
     window.location.reload();
   };
-})();
+
+  async function addSnippetToVideoData (currentVideoData){
+
+    try{
+    const res=await fetch(`${url}/app/video/${currentVideo}`,{
+      headers:{'content-type':'application/json'},
+    })
+    const snippet=await res.json()
+    Object.assign(currentVideoData,snippet)
+    // const ,channelId,channelTitle:channelName,description}=snippet
+}catch(err){
+  console.log('error fetching endpoint',err)
+}
+}
+}
+
+)();
 
 
 window.addEventListener('load',()=>{
@@ -269,6 +278,6 @@ window.addEventListener('load',()=>{
   //     currentVideoData.location=location
   //     currentVideoData.description=document.querySelector('yt-attributed-string-span').textContent
   //   },200)
+  
 })
 
-const areAllDetailsLoaded=document.querySelector('#above-the-fold yt-formatted-string')&&document.querySelector('#text a')&&document.querySelector('yt-attributed-string-span')

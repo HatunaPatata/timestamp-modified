@@ -1,3 +1,5 @@
+const url='https://yt-timestamp.onrender.com'
+// const url='http://localhost:10000'
 export const getCurrentActiveTab = async () => {
   let queryOptions = { active: true, lastFocusedWindow: true };
 
@@ -24,7 +26,7 @@ export const getVideoId = tab => {
     // const bookmarks=JSON.parse(data)
     console.log('got data2',data)
     //http://localhost:10000
-    const res=await fetch("https://yt-timestamp.onrender.com/app/hook",{
+    const res=await fetch(`${url}/app/hook`,{
       method:'post',
       headers:{'content-type':'application/json'},
       body:JSON.stringify(data)
