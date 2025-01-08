@@ -1,10 +1,10 @@
-import { getValueFromStorage, getVideoId, setValueToStorage } from './utils.js';
+import { getValueFromStorage, getVideoId, setValueToStorage } from "./utils.js";
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (
-    changeInfo.status === 'complete' &&
+    changeInfo.status === "complete" &&
     tab.url &&
-    tab.url.includes('youtube.com/watch')
+    tab.url.includes("youtube.com/watch")
   ) {
     const videoId = getVideoId(tab);
     try {
@@ -15,11 +15,11 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       }
 
       chrome.tabs.sendMessage(tabId, {
-        type: 'NEW',
+        type: "NEW",
         videoId: videoId,
         settings: {
-          isTitlePause: result ? result.isTitlePause : false
-        }
+          isTitlePause: result ? result.isTitlePause : false,
+        },
       });
     } catch (error) {
       // An error occurred
@@ -29,8 +29,31 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 });
 
 chrome.storage.onChanged.addListener(function (changes, areaName) {
-  if (areaName === 'sync' && !!changes) {
+  if (areaName === "sync" && !!changes) {
     // Send a message to the options page
-    chrome.runtime.sendMessage({ type: 'refreshOptionsPage' });
+    chrome.runtime.sendMessage({ type: "refreshOptionsPage" });
   }
 });
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "saveToRaven",
+    title: "Save to Raven",
+    contexts: ["selection"],
+  });
+});
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  console.log("info", info);
+  console.log("tab", tab);
+  switch (info.menuItemId) {
+    case "saveToRaven":
+      const res = await chrome.tabs.sendMessage(tab.id, {
+        type: "save-to-raven",
+        selectionText: info.selectionText,
+      });
+      console.log("got res", res);
+  }
+});
+
+//TODO: add icon credit <a target="_blank" href="https://icons8.com/icon/yFBJCjFJpLXw/save">Save</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>

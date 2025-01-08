@@ -1,35 +1,55 @@
 {
-   "action": {
-      "default_icon": {
-         "128": "assets/delete.png",
-         "16": "assets/ext-icon.png",
-         "24": "assets/ext-icon.png",
-         "32": "assets/ext-icon.png"
-      },
-      "default_popup": "popup.html",
-      "default_title": "My Youtube Bookmarks"
-   },
-   "background": {
-      "service_worker": "background.js",
-      "type": "module"
-   },
-   "content_scripts": [ {
-      "css": [ "content.css" ],
-      "js": [ "contentScript.js" ],
-      "matches": [ "https://*.youtube.com/*" ],
+  "action": {
+    "default_icon": {
+      "128": "assets/delete.png",
+      "16": "assets/ext-icon.png",
+      "24": "assets/ext-icon.png",
+      "32": "assets/ext-icon.png"
+    },
+    "default_popup": "popup.html",
+    "default_title": "My Youtube Bookmarks"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "css": ["content.css"],
+      "js": ["youtubeContentScript.js"],
+      "matches": ["https://*.youtube.com/*"],
       "run_at": "document_end"
-   } ],
-   "description": "It helps you save timestamps in Youtube videos",
-   "host_permissions": [ "https://*.youtube.com/*" ],
-   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq9gZJPsj9ArZIh7R4U+HxsJMmcsOiPdsswQ8m1PBtonuaxp6//ZXcUJmik2SGtC3BFrm6cv3VKs2zgPjhRrL6n1sqHFNofTx9MBX9mjgWwiRkN5aEThPFRTmIHSTxbSyyquuNjK0aTlVmIGdiynTu+itVviZ3BjOYtoxfhUjlcDL+dsxM1kDCyzVaUy8LdNxi6Be2y3iwMUQvmInbCaNdOhQGWpQiVu+vzP0LUCGqF5eO6w7XADKVJPQcWlMnaPqXAFRfjTLgnfW2pRNl0aK2bIQIW9+myRToshaIISZmAsY744CsisiSS1JoHVDrlPbCSTsu2TnQuSzPHNiLV5I5QIDAQAB",
-   "manifest_version": 3,
-   "name": "Youtube Timestamp Saver",
-   "options_page": "options.html",
-   "permissions": [ "storage", "tabs" ],
-   "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.1.0",
-   "web_accessible_resources": [ {
-      "matches": [ "https://*.youtube.com/*" ],
-      "resources": [ "*.html", "assets/bookmark.png", "assets/bookmark.gif", "assets/play.png", "assets/delete.png", "assets/save.png" ]
-   } ]
+    },
+    {
+      "js": ["allContentScript.js"],
+      "matches": ["*://*/*"],
+      "run_at": "document_end"
+    }
+  ],
+  "description": "It helps you save timestamps in Youtube videos",
+  "host_permissions": ["https://*.youtube.com/*"],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq9gZJPsj9ArZIh7R4U+HxsJMmcsOiPdsswQ8m1PBtonuaxp6//ZXcUJmik2SGtC3BFrm6cv3VKs2zgPjhRrL6n1sqHFNofTx9MBX9mjgWwiRkN5aEThPFRTmIHSTxbSyyquuNjK0aTlVmIGdiynTu+itVviZ3BjOYtoxfhUjlcDL+dsxM1kDCyzVaUy8LdNxi6Be2y3iwMUQvmInbCaNdOhQGWpQiVu+vzP0LUCGqF5eO6w7XADKVJPQcWlMnaPqXAFRfjTLgnfW2pRNl0aK2bIQIW9+myRToshaIISZmAsY744CsisiSS1JoHVDrlPbCSTsu2TnQuSzPHNiLV5I5QIDAQAB",
+  "manifest_version": 3,
+  "name": "Youtube Timestamp Saver",
+  "options_page": "options.html",
+  "permissions": ["storage", "tabs", "contextMenus"],
+  "update_url": "https://clients2.google.com/service/update2/crx",
+  "version": "0.1.0",
+  "web_accessible_resources": [
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "resources": [
+        "*.html",
+        "assets/bookmark.png",
+        "assets/bookmark.gif",
+        "assets/play.png",
+        "assets/delete.png",
+        "assets/save.png"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "assets/save16.png",
+    "48": "assets/save48.png"
+  }
 }
