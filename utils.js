@@ -1,5 +1,5 @@
-const url = "https://yt-timestamp.onrender.com";
-// const url = "http://localhost:10000";
+// const url = "https://yt-timestamp.onrender.com";
+const url = "http://localhost:10000";
 const YT_PREFIX = "YT-";
 export const getCurrentActiveTab = async () => {
   let queryOptions = { active: true, lastFocusedWindow: true };
@@ -18,6 +18,12 @@ export const getValueFromStorage = async (prefix,key, defaultResponse) => {
   const fullKey = prefix + key;
   const result = await chrome.storage.local.get([fullKey]);
   return result[fullKey] ? JSON.parse(result[fullKey]) : defaultResponse;
+};
+
+export const getAllValuesFromStorage = async ( defaultResponse=null) => {
+  
+  const result = await chrome.storage.local.get();
+  return result|| defaultResponse;
 };
 
 export const setValueToStorage = async (value,prefix, key) => {

@@ -4,9 +4,9 @@
     currentVideoBookmarks = [];
   const currentVideoData = {};
   let bookmarkTitle = "";
-  // const url = "http://localhost:10000";
   const YT_PREFIX = "YT-";
-  const url = "https://yt-timestamp.onrender.com";
+  const url = "http://localhost:10000";
+  // const url = "https://yt-timestamp.onrender.com";
   console.log("url", url);
   let timerId = 0;
   // listner for all emit messages
@@ -26,16 +26,13 @@
       currentVideoBookmarks = currentVideoBookmarks.filter(
         (bookmark) => bookmark.time != value
       );
+      
+      
       setValueToStorage(
         { ...currentVideoData, bookmarks: currentVideoBookmarks },
         YT_PREFIX,
         currentVideo
       );
-      addOrDeleteBookmarkOnServer({
-        videoId: currentVideo,
-        time: value,
-        operationType: type,
-      });
     }
     response(currentVideoBookmarks);
   });
@@ -148,6 +145,10 @@
           ? bookmarkTitle
           : `Bookmark at ${getTime(currentTime)}`,
     };
+
+    // const getVideoTitleRes= await fetch(`${url}/app/YT/?videoId=${currentVideo}&time=${newBookmark.time}`, {
+    //   headers: { "content-type": "application/json" },
+    // });
     // fetch latest bookmarks
     const data = await fetchCurrentVideoData();
     // conacte old and new bookmarks
@@ -163,13 +164,16 @@
     );
     currentVideoData.bookmarks = updatedVideoData.bookmarks;
     currentVideoData.isTitlePause = updatedVideoData.isTitlePause;
-    setValueToStorage(currentVideoData, YT_PREFIX, currentVideo);
-    addOrDeleteBookmarkOnServer({
+    const newVideoData=await addOrDeleteBookmarkOnServer({
       videoId: currentVideo,
       time: newBookmark.time,
       operationType: "NEW",
       timestampTitle: newBookmark.desc,
     });
+    currentVideoData.title=newVideoData.title
+    console.log('currentVideoData',currentVideoData,'newVideoData',newVideoData)
+    setValueToStorage(currentVideoData, YT_PREFIX, currentVideo);
+    
     bookmarkTitle = "";
   };
 
@@ -251,18 +255,6 @@
     window.location.reload();
   };
 
-  async function addSnippetToVideoData(currentVideoData) {
-    try {
-      const res = await fetch(`${url}/app/video/${currentVideo}`, {
-        headers: { "content-type": "application/json" },
-      });
-      const snippet = await res.json();
-      Object.assign(currentVideoData, snippet);
-      // const ,channelId,channelTitle:channelName,description}=snippet
-    } catch (err) {
-      console.log("error fetching endpoint", err);
-    }
-  }
 
   async function addOrDeleteBookmarkOnServer(data) {
     try {
@@ -271,8 +263,9 @@
         headers: { "content-type": "application/json" },
         body: JSON.stringify(data),
       });
-      await res.json();
-      console.log("sent data");
+      const video=await res.json();
+      console.log("sent data",video);
+      return video
     } catch (err) {
       console.log("error in addOrDeleteBookmarkOnServer", err);
     }

@@ -1,4 +1,5 @@
 import {
+  getAllValuesFromStorage,
   getCurrentActiveTab,
   getValueFromStorage,
   getVideoId,
@@ -6,25 +7,34 @@ import {
 } from './utils.js';
 let checkbox;
 const YT_PREFIX = "YT-";
+const TXT_PREFIX="TXT-"
 
 // adding a new bookmark row to the popup
 const addNewBookmark = (bookmarkElement, bookmark) => {
   const title = document.createElement('div');
   const newElement = document.createElement('div');
   const controlElement = document.createElement('div');
-
-  title.textContent = bookmark.desc;
+  const bookmarkType=bookmark.type
+  console.log('addnewBookmark',bookmark)
+  // title.textContent = bookmarkType==="TXT"?bookmark.text:bookmark.desc;
+  title.innerHTML=`
+  <div style="display:flex; flex-direction:column;">
+<span style="font-weight:600;">${bookmark.title}</span>
+<span>${bookmarkType==="TXT"?bookmark.text:bookmark.time+" " +bookmark.desc}</span>
+  </div>
+  `
   title.className = 'bookmark-title';
-  title.title = bookmark.desc;
-
+  title.title = bookmarkType==="TXT"?bookmark.comment:bookmark.desc;
+console.log('title',title)
+const id='bookmark-' + bookmarkType+'-'+bookmarkType==="TXT"?bookmark.comment + "-" +bookmark.text:bookmark.time+bookmark.disc;
   controlElement.className = 'bookmark-controls';
-  newElement.id = 'bookmark-' + bookmark.time;
+  newElement.id = id;
   newElement.className = 'bookmark';
-  newElement.setAttribute('timestamp', bookmark.time);
+  newElement.setAttribute('timestamp', id);
 
   setBookmarkAttributes(controlElement, onPlay, 'play');
   setBookmarkAttributes(controlElement, onDelete, 'delete');
-
+  
   newElement.appendChild(title);
   newElement.appendChild(controlElement);
   bookmarkElement.appendChild(newElement);
@@ -85,22 +95,46 @@ document.addEventListener('DOMContentLoaded', async () => {
   const currentVideo = getVideoId(activeTab);
   const optionButton = document.getElementById('option');
 
-  if (currentVideo && activeTab.url.includes('youtube.com/watch')) {
-    const data = await getValueFromStorage(YT_PREFIX,currentVideo, null);
-    const bookmarks = data?.bookmarks ? data.bookmarks : [];
-    viewBookmarks(bookmarks);
-
+  const isYT= currentVideo && activeTab.url.includes('youtube.com/watch')
+    const allValues = await getAllValuesFromStorage( null);
+    const allBookmarks=[]
+    let data={}
+    for(const itemName in allValues){
+      // let bookmarks=[]
+      console.log('itemName',itemName,allValues[itemName])
+      const item=JSON.parse(allValues[itemName])
+      console.log('item',item,'allValues',allValues[itemName])
+      console.log('item!',item)
+      // if(typeof  item['isTitlePause'!==undefined]){
+        //   data=item
+        //   console.log('did it!',item)
+        //   continue;
+        // }
+        const bookmarkType=itemName.startsWith(YT_PREFIX)?"YT":"TXT"
+        console.log('type',bookmarkType,itemName)
+      if(bookmarkType==="YT"&&item.bookmarks){
+    // bookmarks = item.bookmarks 
+    item.bookmarks.forEach(bookmark=>bookmark.title=item.title)
+    allBookmarks.push(...item.bookmarks)
+  }else if(bookmarkType==="TXT"){
+    // item.type=bookmarkType
+    const txtBookmark={type:bookmarkType,comment:itemName.slice(TXT_PREFIX.length),...item}
+    console.log('its txtBookmark',txtBookmark,item)
+    allBookmarks.push(txtBookmark)
+    console.log('pushed item')
+  }
+}
+console.log('allBookmarks',allBookmarks)
+  viewBookmarks(allBookmarks);
+    console.log('isYt1',isYT)
+    if(isYT){
+      console.log('isYt',isYT)
     checkbox = document.querySelector('input[type="checkbox"]');
     checkbox.checked = data?.isTitlePause ? data?.isTitlePause : false;
     checkbox.addEventListener('change', () =>
       toggleCheckbox(data, currentVideo)
     );
-  } else {
-    const container = document.getElementsByClassName('container')[0];
-    container.innerHTML =
-      '<div class="title">This is not a youtube video page</div>';
-    container.className = 'non-yt-container';
-  }
+    }
 
   optionButton.addEventListener('click', () => {
     chrome.runtime.openOptionsPage(() => {});

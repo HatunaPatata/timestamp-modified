@@ -1,6 +1,6 @@
-const serverUrl = "https://yt-timestamp.onrender.com";
+// const serverUrl = "https://yt-timestamp.onrender.com";
 
-// const serverUrl = "http://localhost:10000";
+const serverUrl = "http://localhost:10000";
 const TXT_PREFIX = "TXT-";
 
 console.log("msg from allContentScript*");
@@ -9,8 +9,9 @@ chrome.runtime.onMessage.addListener((msg, info, sendResponse) => {
   if (msg.type === "SAVE_TO_RAVEN") {
     const comment = prompt("Please enter title for copied text");
     console.log("comment", msg.selectionText, comment);
-    setValueToStorage(msg.selectionText,TXT_PREFIX,msg.comment);
-     sendText({comment,text:msg.selectionText})
+    const data=getPageData()
+    setValueToStorage({text:msg.selectionText,favIcon:data.favIcon,title:data.title},TXT_PREFIX,comment);
+     sendText({comment,text:msg.selectionText,...data})
   }
   sendResponse({ msg: "got it" });
 });
@@ -24,13 +25,7 @@ const setValueToStorage = async (value, prefix, key) => {
 //TODO: share all utils between scripts
 
 async function sendText(data) {
-  const title=document.title
-  const url=location.href
-  const metaTags=document.querySelectorAll('meta')
-  const meta=Array.from(metaTags).map(tag=>tag.outerHTML).join("\r\n")
-  const favIconLink=document.querySelector('link[rel="icon"')||document.querySelector('link[rel="shortcut icon"')
-  let favIcon=favIconLink?favIconLink.href:location.host+'/favicon.ico'
-  Object.assign(data,{favIcon,title,url,meta})
+  
   console.log('sendText data',data)
   try {
   const res = await fetch(`${serverUrl}/app/hook/txt`, {
@@ -43,4 +38,14 @@ async function sendText(data) {
 } catch (err) {
   console.log("error in sendText", err);
 }
+}
+
+function getPageData(){
+  const title=document.title
+  const url=location.href
+  const metaTags=document.querySelectorAll('meta')
+  const meta=Array.from(metaTags).map(tag=>tag.outerHTML).join("\r\n")
+  const favIconLink=document.querySelector('link[rel="icon"')||document.querySelector('link[rel="shortcut icon"')
+  let favIcon=favIconLink?favIconLink.href:location.host+'/favicon.ico'
+  return {favIcon,title,url,meta}
 }
