@@ -4,9 +4,9 @@
     currentVideoBookmarks = [];
   const currentVideoData = {};
   let bookmarkTitle = "";
-  const url = "http://localhost:10000";
+  // const url = "http://localhost:10000";
   const YT_PREFIX = "YT-";
-  // const url = "https://yt-timestamp.onrender.com";
+  const url = "https://yt-timestamp.onrender.com";
   console.log("url", url);
   let timerId = 0;
   // listner for all emit messages
@@ -44,7 +44,7 @@
   const getValueFromStorage = async (prefix, key, defaultResponse) => {
     const fullKey = prefix + key;
     const result = await chrome.storage.local.get([fullKey]);
-    return result[key] ? JSON.parse(result[key]) : defaultResponse;
+    return result[fullKey] ? JSON.parse(result[fullKey]) : defaultResponse;
   };
 
   const setValueToStorage = async (value, prefix, key) => {
@@ -266,7 +266,7 @@
 
   async function addOrDeleteBookmarkOnServer(data) {
     try {
-      const res = await fetch(`${url}/app/hook`, {
+      const res = await fetch(`${url}/app/hook/yt`, {
         method: "post",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(data),

@@ -1,12 +1,12 @@
-// const url = "https://yt-timestamp.onrender.com";
-const url = "http://localhost:10000";
+const url = "https://yt-timestamp.onrender.com";
+// const url = "http://localhost:10000";
+const YT_PREFIX = "YT-";
 export const getCurrentActiveTab = async () => {
   let queryOptions = { active: true, lastFocusedWindow: true };
 
   let [tab] = await chrome.tabs.query(queryOptions);
   return tab;
 };
-const YT_PREFIX = "YT-";
 
 export const getVideoId = (tab) => {
   const queryParameters = tab.url.split("?")[1];
@@ -14,13 +14,13 @@ export const getVideoId = (tab) => {
   return urlParameters.get("v");
 };
 
-export const getValueFromStorage = async (key, defaultResponse) => {
-  const fullKey = YT_PREFIX + key;
+export const getValueFromStorage = async (prefix,key, defaultResponse) => {
+  const fullKey = prefix + key;
   const result = await chrome.storage.local.get([fullKey]);
-  return result[fullKey] ? JSON.parse(result[key]) : defaultResponse;
+  return result[fullKey] ? JSON.parse(result[fullKey]) : defaultResponse;
 };
 
-export const setValueToStorage = async (value, key) => {
-  const fullKey = YT_PREFIX + key;
+export const setValueToStorage = async (value,prefix, key) => {
+  const fullKey = prefix + key;
   await chrome.storage.local.set({ [fullKey]: JSON.stringify(value) });
 };

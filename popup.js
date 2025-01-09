@@ -5,6 +5,7 @@ import {
   setValueToStorage
 } from './utils.js';
 let checkbox;
+const YT_PREFIX = "YT-";
 
 // adding a new bookmark row to the popup
 const addNewBookmark = (bookmarkElement, bookmark) => {
@@ -85,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const optionButton = document.getElementById('option');
 
   if (currentVideo && activeTab.url.includes('youtube.com/watch')) {
-    const data = await getValueFromStorage(currentVideo, null);
+    const data = await getValueFromStorage(YT_PREFIX,currentVideo, null);
     const bookmarks = data?.bookmarks ? data.bookmarks : [];
     viewBookmarks(bookmarks);
 
@@ -109,8 +110,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 const toggleCheckbox = async (data, currentVideo) => {
   if (checkbox.checked) {
-    setValueToStorage({ ...data, isTitlePause: true }, currentVideo);
+    setValueToStorage({ ...data, isTitlePause: true },YT_PREFIX, currentVideo);
   } else {
-    setValueToStorage({ ...data, isTitlePause: false }, currentVideo);
+    setValueToStorage({ ...data, isTitlePause: false },YT_PREFIX, currentVideo);
   }
 };

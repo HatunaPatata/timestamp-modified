@@ -12,7 +12,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       const result = await getValueFromStorage(YT_PREFIX, videoId, null);
 
       if (!result || result.isTitlePause == null) {
-        setValueToStorage({ ...result, isTitlePause: false }, videoId);
+        setValueToStorage({ ...result, isTitlePause: false },YT_PREFIX, videoId);
       }
 
       chrome.tabs.sendMessage(tabId, {

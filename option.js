@@ -1,3 +1,5 @@
+const YT_PREFIX = "YT-";
+
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.type === 'refreshOptionsPage') {
@@ -71,14 +73,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // get bookmarks from storage
   const getBookmarks = async () => {
-    const result = await chrome.storage.sync.get();
-    Object.keys(result).forEach(bookmark => {
+    const result = await chrome.storage.local.get();
+    Object.keys(result).filter(key=>key.startsWith(YT_PREFIX)).forEach(bookmark => {
       parseBookmark = JSON.parse(result[bookmark]);
       if (parseBookmark?.bookmarks?.length > 0) {
         parseBookmark?.bookmarks.forEach((parseMark, index) => {
           bookmarks.push({
             ...parseMark,
-            videoId: bookmark,
+            videoId: parseBookmark.id,
             title: parseBookmark.title || '',
             thumbnail: parseBookmark.thumbnail || ''
           });
