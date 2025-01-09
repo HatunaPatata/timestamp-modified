@@ -1,4 +1,5 @@
 import { getValueFromStorage, getVideoId, setValueToStorage } from "./utils.js";
+const YT_PREFIX = "YT-";
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (
@@ -8,7 +9,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   ) {
     const videoId = getVideoId(tab);
     try {
-      const result = await getValueFromStorage(videoId, null);
+      const result = await getValueFromStorage(YT_PREFIX, videoId, null);
 
       if (!result || result.isTitlePause == null) {
         setValueToStorage({ ...result, isTitlePause: false }, videoId);
@@ -49,7 +50,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   switch (info.menuItemId) {
     case "saveToRaven":
       const res = await chrome.tabs.sendMessage(tab.id, {
-        type: "save-to-raven",
+        type: "SAVE_TO_RAVEN",
         selectionText: info.selectionText,
       });
       console.log("got res", res);

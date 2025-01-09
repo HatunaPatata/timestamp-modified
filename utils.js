@@ -6,6 +6,7 @@ export const getCurrentActiveTab = async () => {
   let [tab] = await chrome.tabs.query(queryOptions);
   return tab;
 };
+const YT_PREFIX = "YT-";
 
 export const getVideoId = (tab) => {
   const queryParameters = tab.url.split("?")[1];
@@ -14,10 +15,12 @@ export const getVideoId = (tab) => {
 };
 
 export const getValueFromStorage = async (key, defaultResponse) => {
-  const result = await chrome.storage.local.get([key]);
-  return result[key] ? JSON.parse(result[key]) : defaultResponse;
+  const fullKey = YT_PREFIX + key;
+  const result = await chrome.storage.local.get([fullKey]);
+  return result[fullKey] ? JSON.parse(result[key]) : defaultResponse;
 };
 
 export const setValueToStorage = async (value, key) => {
-  await chrome.storage.local.set({ [key]: JSON.stringify(value) });
+  const fullKey = YT_PREFIX + key;
+  await chrome.storage.local.set({ [fullKey]: JSON.stringify(value) });
 };

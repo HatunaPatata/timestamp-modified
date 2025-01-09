@@ -5,6 +5,7 @@
   const currentVideoData = {};
   let bookmarkTitle = "";
   const url = "http://localhost:10000";
+  const YT_PREFIX = "YT-";
   // const url = "https://yt-timestamp.onrender.com";
   console.log("url", url);
   let timerId = 0;
@@ -27,6 +28,7 @@
       );
       setValueToStorage(
         { ...currentVideoData, bookmarks: currentVideoBookmarks },
+        YT_PREFIX,
         currentVideo
       );
       addOrDeleteBookmarkOnServer({
@@ -39,26 +41,21 @@
   });
 
   // reusable methods
-  const getValueFromStorage = async (key, defaultResponse) => {
-    const result = await chrome.storage.local.get([key]);
+  const getValueFromStorage = async (prefix, key, defaultResponse) => {
+    const fullKey = prefix + key;
+    const result = await chrome.storage.local.get([fullKey]);
     return result[key] ? JSON.parse(result[key]) : defaultResponse;
   };
 
-  const setValueToStorage = async (value, key) => {
-    await chrome.storage.local.set({ [key]: JSON.stringify(value) });
-    // const data = await chrome.storage.local.get();
-    // const res = await fetch(`${url}/app/hook`, {
-    //   method: "post",
-    //   headers: { "content-type": "application/json" },
-    //   body: JSON.stringify(data),
-    // });
-    // await res.json();
+  const setValueToStorage = async (value, prefix, key) => {
+    const fullKey = prefix + key;
+    await chrome.storage.local.set({ [fullKey]: JSON.stringify(value) });
   };
 
   // Methods
   const fetchCurrentVideoData = async () => {
     try {
-      const data = await getValueFromStorage(currentVideo, {});
+      const data = await getValueFromStorage(YT_PREFIX, currentVideo, {});
       currentVideoData["bookmarks"] = data.bookmarks;
       currentVideoData["isTitlePause"] = data.isTitlePause;
 
@@ -166,7 +163,7 @@
     );
     currentVideoData.bookmarks = updatedVideoData.bookmarks;
     currentVideoData.isTitlePause = updatedVideoData.isTitlePause;
-    setValueToStorage(currentVideoData, currentVideo);
+    setValueToStorage(currentVideoData, YT_PREFIX, currentVideo);
     addOrDeleteBookmarkOnServer({
       videoId: currentVideo,
       time: newBookmark.time,
