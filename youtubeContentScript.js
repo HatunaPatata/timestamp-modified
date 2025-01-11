@@ -11,7 +11,7 @@
   let timerId = 0;
   // listner for all emit messages
   chrome.runtime.onMessage.addListener((obj, sender, response) => {
-    response(currentVideoBookmarks);
+    // response(currentVideoBookmarks);
     (async () => {
       const { type, value, videoId, settings } = obj;
 
@@ -20,12 +20,16 @@
         isTitlePause = settings.isTitlePause;
         currentVideoData.id = videoId;
         // addSnippetToVideoData(currentVideoData);
-
         newVideoLoaded();
       } else if (type === "PLAY") {
         youtubePlayer.currentTime = value;
-      } else if (type === "RESUME") {
-        youtubePlayer.play();
+      } else if (type === "TOGGLE_PLAYER") {
+        if (youtubePlayer.paused) {
+          youtubePlayer.play();
+        } else {
+          youtubePlayer.pause();
+        }
+        response(youtubePlayer.paused);
       } else if (type === "PAUSE") {
         youtubePlayer.pause();
         // } else if (type === "DELETE") {
@@ -45,6 +49,7 @@
           currentVideo
         );
       }
+      response({});
     })();
     return true;
   });

@@ -25,10 +25,8 @@ const addNewBookmark = (bookmarkElement, bookmark) => {
   }"/>
   <div>
   <div style="display:flex; flex-direction:column;">
-<span style="font-weight:600;">${bookmark.title}</span>
-<span>${
-    bookmark.text || formatTime(bookmark.time.toString()) + " " + bookmark.desc
-  }</span>
+<span style="font-weight:600;">${bookmark.title || bookmark.desc}</span>
+<span>${bookmark.text || formatTime(bookmark.time)}</span>
   </div>
   </div>
   </div>
@@ -184,27 +182,37 @@ const toggleCheckbox = async (data2, currentVideo) => {
   console.log("checked", checked);
   if (checked === "off") {
     setValueToStorage({ ...data, isTitlePause: true }, YT_PREFIX, currentVideo);
-    checkbox.setAttribute("data-on", "on");
-    checkbox.src = "assets/play_on.svg";
+    // checkbox.setAttribute("data-on", "on");
+    // checkbox.src = "assets/play_on.svg";
   } else {
     setValueToStorage(
       { ...data, isTitlePause: false },
       YT_PREFIX,
       currentVideo
     );
-    checkbox.setAttribute("data-on", "off");
-    checkbox.src = "assets/play_off.svg";
+    // checkbox.setAttribute("data-on", "off");
+    // checkbox.src = "assets/play_off.svg";
   }
   const activeTab = await getCurrentActiveTab();
-  chrome.tabs.sendMessage(activeTab.id, {
-    type: checked === "off" ? "RESUME" : "PAUSE",
+  const isPaused = await chrome.tabs.sendMessage(activeTab.id, {
+    // type: checked === "off" ? "RESUME" : "PAUSE",
+    type: "TOGGLE_PLAYER",
   });
+  console.log("isPaused", isPaused);
+  if (isPaused) {
+    checkbox.setAttribute("data-on", "off");
+    checkbox.src = "assets/play_off.svg";
+  } else {
+    checkbox.setAttribute("data-on", "on");
+    checkbox.src = "assets/play_on.svg";
+  }
 };
 
 async function loadBookmarks() {
   const activeTab = await getCurrentActiveTab();
   const currentVideo = getVideoId(activeTab);
-  const optionButton = document.getElementById("option");
+  // const optionButton = document.getElementById("option");
+  const homeButton = document.getElementById("home-btn");
 
   const filterOn = filterBtn.getAttribute("data-on");
   console.log("is filter on", filterOn);
@@ -295,7 +303,7 @@ async function loadBookmarks() {
   //   toggleCheckbox(data, currentVideo)
   // );
 
-  optionButton.addEventListener("click", () => {
+  homeButton.addEventListener("click", () => {
     chrome.runtime.openOptionsPage(() => {});
   });
 }
@@ -316,8 +324,8 @@ filterBtn.addEventListener("click", async () => {
   const filterOn = filterBtn.getAttribute("data-on");
   filterBtn.setAttribute("data-on", filterOn === "on" ? "off" : "on");
   console.log("filter clicked", filterOn);
-  filterBtn.src =
-    filterOn === "off" ? "assets/filter_on.svg" : "assets/filter_off.svg";
+  // filterBtn.src =
+  //   filterOn === "off" ? "assets/filter_on.svg" : "assets/filter_off.svg";
   loadBookmarks();
 });
 

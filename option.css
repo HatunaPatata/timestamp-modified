@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap");
 
 body {
   background: #e8ebf3;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 .container {
   display: flex;
@@ -23,7 +23,7 @@ body {
   color: #777;
   border-radius: 50px;
   font-size: 12px;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   position: relative;
   z-index: 99;
   max-width: 500px;
@@ -34,7 +34,6 @@ body {
   background: #fcfcfc;
   border: 1px solid #ddd;
 }
-
 
 .bookmarks {
   max-width: 1600px;
@@ -57,11 +56,15 @@ body {
 }
 
 @media (max-width: 1560px) {
-  .bookmarks { grid-template-columns: repeat(2, 1fr); }
+  .bookmarks {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 1024px) {
-  .bookmarks { grid-template-columns: repeat(1, 1fr); }
+  .bookmarks {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 /* -------------------------------------- */
@@ -87,7 +90,7 @@ body {
   overflow: hidden;
   margin-bottom: 10px;
   background-color: white;
-  height: 150px;
+  /* height: 150px; */
 }
 .card:hover {
   box-shadow: 1px 2px 4px 0px #d1d1d1;
@@ -140,8 +143,8 @@ button {
   padding: 14px;
   font-size: 12px;
   color: #141b22;
-  font-family: 'Poppins', sans-serif;
-  color:white
+  font-family: "Poppins", sans-serif;
+  color: white;
 }
 
 button:hover {

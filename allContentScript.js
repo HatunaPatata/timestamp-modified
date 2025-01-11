@@ -10,11 +10,16 @@ chrome.runtime.onMessage.addListener(async (msg, info, sendResponse) => {
   if (msg.type === "SAVE_TO_RAVEN") {
     const comment = prompt("Please enter title for copied text");
     console.log("comment", comment, msg.selectionText, comment);
+    if (!comment) {
+      sendResponse({});
+      return;
+    }
     const data = getPageData();
 
     setValueToStorage(
       {
         text: msg.selectionText,
+        comment,
         favIcon: data.favIcon,
         title: data.title,
         url: data.url,
@@ -29,11 +34,11 @@ chrome.runtime.onMessage.addListener(async (msg, info, sendResponse) => {
     const result = await getValueFromStorage();
     let id;
     if (isTxt) {
-      id=msg.id.slice(TXT_PREFIX.length)
+      id = msg.id.slice(TXT_PREFIX.length);
       chrome.storage.local.remove(msg.key);
       // setValueToStorage(result, TXT_PREFIX, msg.id);
     } else {
-      id=msg.id.slice(YT_PREFIX.length)
+      id = msg.id.slice(YT_PREFIX.length);
       const data = JSON.parse(result[msg.key]);
       let bookmarks = data.bookmarks || [];
       bookmarks = bookmarks.filter((bookmark) => {
@@ -42,7 +47,7 @@ chrome.runtime.onMessage.addListener(async (msg, info, sendResponse) => {
 
       setValueToStorage({ ...data, bookmarks }, "", msg.key);
     }
-    deleteBookmark({type:isTxt?"TXT":"YT", id})
+    deleteBookmark({ type: isTxt ? "TXT" : "YT", id });
   }
   sendResponse({ a: "b" });
 });
@@ -96,14 +101,21 @@ function getPageData() {
   return { favIcon, title, url, meta };
 }
 
-
-async function deleteBookmark({type,id}){
-  console.log('deleteing bookmark',type,id,`${serverUrl}/app/${type.toLowerCase()}/${encodeURIComponent(id)}`)
+async function deleteBookmark({ type, id }) {
+  console.log(
+    "deleteing bookmark",
+    type,
+    id,
+    `${serverUrl}/app/${type.toLowerCase()}/${encodeURIComponent(id)}`
+  );
   try {
-    const res = await fetch(`${serverUrl}/app/${type.toLowerCase()}/${encodeURIComponent(id)}`, {
-      method: "delete",
-      headers: { "content-type": "application/json" },
-    });
+    const res = await fetch(
+      `${serverUrl}/app/${type.toLowerCase()}/${encodeURIComponent(id)}`,
+      {
+        method: "delete",
+        headers: { "content-type": "application/json" },
+      }
+    );
     await res.json();
     console.log("deleted data");
   } catch (err) {
