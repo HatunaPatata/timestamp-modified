@@ -1,6 +1,6 @@
-// const serverUrl = "https://yt-timestamp.onrender.com";
+const serverUrl = "https://yt-timestamp.onrender.com";
 
-const serverUrl = "http://localhost:10000";
+// const serverUrl = "http://localhost:10000";
 const TXT_PREFIX = "TXT-";
 const YT_PREFIX = "YT-";
 console.log("msg from allContentScript*");
