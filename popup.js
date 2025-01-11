@@ -95,7 +95,9 @@ const goToText = (e) => {
   const parentNode = e.target.parentNode.parentNode;
   const url = parentNode.getAttribute("url");
   const text = parentNode.getAttribute("text");
-  const textFragment = encodeURI(`${url}#:~:text=${text}`);
+  const textFragment = `${url}#:~:text=${text
+    .replaceAll("-", encodeURI("-"))
+    .replaceAll(",", encodeURI(","))}`;
   window.open(textFragment);
   // const link = document.createElement("a");
   // link.href = encodeURI(`${url}#:~:text=${text}`);
