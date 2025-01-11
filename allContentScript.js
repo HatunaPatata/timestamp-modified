@@ -1,6 +1,6 @@
-const serverUrl = "https://yt-timestamp.onrender.com";
+// const serverUrl = "https://yt-timestamp.onrender.com";
 
-// const serverUrl = "http://localhost:10000";
+const serverUrl = "http://localhost:10000";
 const TXT_PREFIX = "TXT-";
 const YT_PREFIX = "YT-";
 console.log("msg from allContentScript*");
@@ -27,10 +27,13 @@ chrome.runtime.onMessage.addListener(async (msg, info, sendResponse) => {
     console.log("deleting", msg);
     const isTxt = msg.id.startsWith(TXT_PREFIX);
     const result = await getValueFromStorage();
+    let id;
     if (isTxt) {
+      id=msg.id.slice(TXT_PREFIX.length)
       chrome.storage.local.remove(msg.key);
       // setValueToStorage(result, TXT_PREFIX, msg.id);
     } else {
+      id=msg.id.slice(YT_PREFIX.length)
       const data = JSON.parse(result[msg.key]);
       let bookmarks = data.bookmarks || [];
       bookmarks = bookmarks.filter((bookmark) => {
@@ -39,6 +42,7 @@ chrome.runtime.onMessage.addListener(async (msg, info, sendResponse) => {
 
       setValueToStorage({ ...data, bookmarks }, "", msg.key);
     }
+    deleteBookmark({type:isTxt?"TXT":"YT", id})
   }
   sendResponse({ a: "b" });
 });
@@ -90,4 +94,19 @@ function getPageData() {
     document.querySelector('link[rel="shortcut icon"');
   let favIcon = favIconLink ? favIconLink.href : location.host + "/favicon.ico";
   return { favIcon, title, url, meta };
+}
+
+
+async function deleteBookmark({type,id}){
+  console.log('deleteing bookmark',type,id,`${serverUrl}/app/${type.toLowerCase()}/${encodeURIComponent(id)}`)
+  try {
+    const res = await fetch(`${serverUrl}/app/${type.toLowerCase()}/${encodeURIComponent(id)}`, {
+      method: "delete",
+      headers: { "content-type": "application/json" },
+    });
+    await res.json();
+    console.log("deleted data");
+  } catch (err) {
+    console.log("error in deleteBookmark", err);
+  }
 }

@@ -111,7 +111,7 @@ const goToText = (e) => {
 const onPlay = async (e) => {
   const parentNode = e.target.parentNode.parentNode;
   const bookmarkTime = parentNode.getAttribute("timestamp");
-  const videoId = parentNode.getAttribute("videoId");
+  const videoId = parentNode.getAttribute("key").slice(YT_PREFIX.length);
   const time = parentNode.getAttribute("time");
   const activeTab = await getCurrentActiveTab();
   console.log("activeTab", time, activeTab, activeTab.url, videoId);
