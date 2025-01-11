@@ -5,36 +5,48 @@
   const currentVideoData = {};
   let bookmarkTitle = "";
   const YT_PREFIX = "YT-";
-  const url = "http://localhost:10000";
-  // const url = "https://yt-timestamp.onrender.com";
+  // const url = "http://localhost:10000";
+  const url = "https://yt-timestamp.onrender.com";
   console.log("url", url);
   let timerId = 0;
   // listner for all emit messages
-  chrome.runtime.onMessage.addListener(async (obj, sender, response) => {
-    const { type, value, videoId, settings } = obj;
-
-    if (type === "NEW") {
-      currentVideo = videoId;
-      isTitlePause = settings.isTitlePause;
-      currentVideoData.id = videoId;
-      // addSnippetToVideoData(currentVideoData);
-
-      newVideoLoaded();
-    } else if (type === "PLAY") {
-      youtubePlayer.currentTime = value;
-    } else if (type === "DELETE") {
-      currentVideoBookmarks = currentVideoBookmarks.filter(
-        (bookmark) => bookmark.time != value
-      );
-      
-      
-      setValueToStorage(
-        { ...currentVideoData, bookmarks: currentVideoBookmarks },
-        YT_PREFIX,
-        currentVideo
-      );
-    }
+  chrome.runtime.onMessage.addListener((obj, sender, response) => {
     response(currentVideoBookmarks);
+    (async () => {
+      const { type, value, videoId, settings } = obj;
+
+      if (type === "NEW") {
+        currentVideo = videoId;
+        isTitlePause = settings.isTitlePause;
+        currentVideoData.id = videoId;
+        // addSnippetToVideoData(currentVideoData);
+
+        newVideoLoaded();
+      } else if (type === "PLAY") {
+        youtubePlayer.currentTime = value;
+      } else if (type === "RESUME") {
+        youtubePlayer.play();
+      } else if (type === "PAUSE") {
+        youtubePlayer.pause();
+        // } else if (type === "DELETE") {
+        //   currentVideoBookmarks = currentVideoBookmarks.filter((bookmark) => {
+        //     console.log("filter bookmark", bookmark);
+        //     const isYT = bookmark.id.startsWith(YT_PREFIX);
+        //     const bookmarkId = isYT
+        //       ? bookmark.id + bookmark.time.toString()
+        //       : bookmark.comment + bookmark.url;
+        //     return id === bookmarkId;
+        //     // bookmark.time != value
+        //   });
+
+        setValueToStorage(
+          { ...currentVideoData, bookmarks: currentVideoBookmarks },
+          YT_PREFIX,
+          currentVideo
+        );
+      }
+    })();
+    return true;
   });
 
   // reusable methods
@@ -82,7 +94,7 @@
 
       youtubeRightControls =
         document.getElementsByClassName("ytp-right-controls")[0];
-      youtubePlayer = document.getElementsByClassName("video-stream")[0];
+      youtubePlayer = document.querySelector("video");
 
       iconWrapper.appendChild(bookmarkBtn);
       bookmarkContainer.appendChild(iconWrapper);
@@ -164,16 +176,26 @@
     );
     currentVideoData.bookmarks = updatedVideoData.bookmarks;
     currentVideoData.isTitlePause = updatedVideoData.isTitlePause;
-    const newVideoData=await addOrDeleteBookmarkOnServer({
+    const newVideoData = await addOrDeleteBookmarkOnServer({
       videoId: currentVideo,
       time: newBookmark.time,
       operationType: "NEW",
       timestampTitle: newBookmark.desc,
     });
-    currentVideoData.title=newVideoData.title
-    console.log('currentVideoData',currentVideoData,'newVideoData',newVideoData)
-    setValueToStorage(currentVideoData, YT_PREFIX, currentVideo);
-    
+    if (newVideoData.error) return;
+    currentVideoData.title = newVideoData.title;
+    console.log(
+      "currentVideoData",
+      currentVideoData,
+      "newVideoData",
+      newVideoData
+    );
+    setValueToStorage(
+      { ...currentVideoData, ...newVideoData },
+      YT_PREFIX,
+      currentVideo
+    );
+
     bookmarkTitle = "";
   };
 
@@ -255,7 +277,6 @@
     window.location.reload();
   };
 
-
   async function addOrDeleteBookmarkOnServer(data) {
     try {
       const res = await fetch(`${url}/app/hook/yt`, {
@@ -263,11 +284,12 @@
         headers: { "content-type": "application/json" },
         body: JSON.stringify(data),
       });
-      const video=await res.json();
-      console.log("sent data",video);
-      return video
+      const video = await res.json();
+      console.log("sent data", video);
+      return video;
     } catch (err) {
       console.log("error in addOrDeleteBookmarkOnServer", err);
+      return err;
     }
   }
 })();

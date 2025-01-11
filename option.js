@@ -1,28 +1,29 @@
 const YT_PREFIX = "YT-";
 
 // Listen for messages from the background script
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.type === 'refreshOptionsPage') {
+chrome.age.addListener(function (message, sender, sendResponse) {
+  sendResponse({});
+  if (message.type === "refreshOptionsPage") {
     // Reload the options page to fetch the latest data from sync storage
     location.reload();
   }
 });
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const bookmarks = [];
   let parseBookmark = {};
 
   // Elements reference
-  const buttonElement = document.getElementById('search');
-  const bookmarkElement = document.getElementById('bookmark-list');
+  const buttonElement = document.getElementById("search");
+  const bookmarkElement = document.getElementById("bookmark-list");
 
-  const getTime = t => {
+  const getTime = (t) => {
     const date = new Date(0);
     date.setSeconds(t);
     return date.toISOString().slice(11, 19);
   };
 
-  const secondsToTime = seconds => {
+  const secondsToTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = Math.floor(seconds % 60);
@@ -30,28 +31,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${hours}h${minutes}m${remainingSeconds}s`;
   };
 
-  const handleClick = event => {
+  const handleClick = (event) => {
     window.open(
       `https://www.youtube.com/watch?v=${event.videoId}&t=${secondsToTime(
         event.time
       )}`,
-      '_blank'
+      "_blank"
     );
   };
 
   // render bookmarks in DOM
-  const renderBookmarks = bookmarks => {
-    bookmarks.forEach(bookmark => {
-      const cardDiv = document.createElement('div');
+  const renderBookmarks = (bookmarks) => {
+    bookmarks.forEach((bookmark) => {
+      const cardDiv = document.createElement("div");
 
-      cardDiv.className = 'card';
+      cardDiv.className = "card";
       cardDiv.id = `bookmark-${bookmark.time}`;
       cardDiv.innerHTML = `
         <img src=${
-          bookmark.thumbnail || '/assets/default-placeholder.png'
+          bookmark.thumbnail || "/assets/default-placeholder.png"
         } alt="Video Thumbnail">
         <div class="card-content">
-          <h2 class="video-title">${bookmark.title || 'Video Title'}</h2>
+          <h2 class="video-title">${bookmark.title || "Video Title"}</h2>
           <p class="description">${bookmark.desc}</p>
           <p class="timestamp">${getTime(bookmark.time)}</p>
         </div>
@@ -61,11 +62,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const cardElement = document.getElementById(`bookmark-${bookmark.time}`);
 
-      cardElement.addEventListener('click', () =>
+      cardElement.addEventListener("click", () =>
         handleClick({
           ...bookmark,
-          title: bookmark.title || '',
-          thumbnail: bookmark.thumbnail || ''
+          title: bookmark.title || "",
+          thumbnail: bookmark.thumbnail || "",
         })
       );
     });
@@ -74,32 +75,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   // get bookmarks from storage
   const getBookmarks = async () => {
     const result = await chrome.storage.local.get();
-    Object.keys(result).filter(key=>key.startsWith(YT_PREFIX)).forEach(bookmark => {
-      parseBookmark = JSON.parse(result[bookmark]);
-      if (parseBookmark?.bookmarks?.length > 0) {
-        parseBookmark?.bookmarks.forEach((parseMark, index) => {
-          bookmarks.push({
-            ...parseMark,
-            videoId: parseBookmark.id,
-            title: parseBookmark.title || '',
-            thumbnail: parseBookmark.thumbnail || ''
+    Object.keys(result)
+      .filter((key) => key.startsWith(YT_PREFIX))
+      .forEach((bookmark) => {
+        parseBookmark = JSON.parse(result[bookmark]);
+        if (parseBookmark?.bookmarks?.length > 0) {
+          parseBookmark?.bookmarks.forEach((parseMark, index) => {
+            bookmarks.push({
+              ...parseMark,
+              videoId: parseBookmark.id,
+              title: parseBookmark.title || "",
+              thumbnail: parseBookmark.thumbnail || "",
+            });
           });
-        });
-      }
-    });
+        }
+      });
     console.log(bookmarks);
     renderBookmarks(bookmarks);
   };
 
   const handleSearch = () => {
-    const searchInput = document.getElementById('filter');
+    const searchInput = document.getElementById("filter");
     const searchText = searchInput.value;
 
-    bookmarkElement.innerHTML = '';
+    bookmarkElement.innerHTML = "";
 
     if (searchText) {
       const filterBookmarks = bookmarks.filter(
-        bookmark =>
+        (bookmark) =>
           bookmark.desc.toLowerCase().includes(searchText.toLowerCase()) ||
           bookmark.title.toLowerCase().includes(searchText.toLowerCase())
       );
@@ -109,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
   // listners
-  buttonElement.addEventListener('click', handleSearch);
+  buttonElement.addEventListener("click", handleSearch);
 
   // init methods()
   getBookmarks();

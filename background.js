@@ -12,7 +12,11 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       const result = await getValueFromStorage(YT_PREFIX, videoId, null);
 
       if (!result || result.isTitlePause == null) {
-        setValueToStorage({ ...result, isTitlePause: false },YT_PREFIX, videoId);
+        setValueToStorage(
+          { ...result, isTitlePause: false },
+          YT_PREFIX,
+          videoId
+        );
       }
 
       chrome.tabs.sendMessage(tabId, {
@@ -49,12 +53,20 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   console.log("tab", tab);
   switch (info.menuItemId) {
     case "saveToRaven":
-      const res = await chrome.tabs.sendMessage(tab.id, {
-        type: "SAVE_TO_RAVEN",
-        selectionText: info.selectionText,
-      });
+      const res = await chrome.tabs.sendMessage(
+        tab.id,
+        {
+          type: "SAVE_TO_RAVEN",
+          selectionText: info.selectionText,
+        },
+        (res) => console.log("received reply", res)
+      );
       console.log("got res", res);
   }
 });
+
+// chrome.storage.onChanged.addListener(() => {
+//   chrome.runtime.sendMessage({ type: "LOAD_BOOKMARKS" });
+// });
 
 //TODO: add icon credit <a target="_blank" href="https://icons8.com/icon/yFBJCjFJpLXw/save">Save</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>

@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap");
 
 body {
   background-image: linear-gradient(#fdfeff, #deeeff);
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 400;
   height: 360px;
 }
@@ -44,6 +44,7 @@ body {
   height: 50px;
   margin-bottom: 7px;
   border-bottom: 1px solid #d3d9da;
+  gap: 10px;
 }
 
 .bookmark:hover {
@@ -61,7 +62,7 @@ body {
 }
 
 .bookmarks::after {
-  content: '';
+  content: "";
   width: 100%;
   height: 376px;
   position: absolute;
@@ -71,12 +72,12 @@ body {
   pointer-events: none;
 }
 
-.bookmark-title {
+.bookmark-title span {
   padding-left: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 190px;
+  width: 140px;
   color: #7b7b7b;
 }
 
@@ -88,7 +89,7 @@ body {
 }
 
 .bookmark-controls {
-  flex: auto;
+  display: flex;
   text-align: right;
 }
 
@@ -125,7 +126,7 @@ body {
 
 .slider:before {
   position: absolute;
-  content: '';
+  content: "";
   height: 13px;
   width: 13px;
   left: 3px;
@@ -178,6 +179,6 @@ nav button {
   border: none;
   border-radius: 100%;
   padding: 5px;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   cursor: pointer;
 }
