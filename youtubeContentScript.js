@@ -64,6 +64,7 @@
   const setValueToStorage = async (value, prefix, key) => {
     const fullKey = prefix + key;
     await chrome.storage.local.set({ [fullKey]: JSON.stringify(value) });
+    chrome.runtime.sendMessage({ type: "refreshOptionsPage" });
   };
 
   // Methods

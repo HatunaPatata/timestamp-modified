@@ -34,7 +34,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 });
 
 chrome.storage.onChanged.addListener(function (changes, areaName) {
-  if (areaName === "sync" && !!changes) {
+  if (areaName === "local" && !!changes) {
     // Send a message to the options page
     chrome.runtime.sendMessage({ type: "refreshOptionsPage" });
   }
