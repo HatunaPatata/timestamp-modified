@@ -1,19 +1,20 @@
-const serverUrl = "https://yt-timestamp.onrender.com";
+// const serverUrl = "https://yt-timestamp.onrender.com";
 
-// const serverUrl = "http://localhost:10000";
+const serverUrl = "https://yt-timestamp-py.onrender.com";
+// const serverUrl = "http://localhost:3000";
 const TXT_PREFIX = "TXT-";
 const YT_PREFIX = "YT-";
 console.log("msg from allContentScript*");
 chrome.runtime.onMessage.addListener(async (msg, info, sendResponse) => {
   console.log("msg", msg, "info", info);
 
+  sendResponse({});
   if (msg.type === "SAVE_TO_RAVEN") {
     const comment = prompt("Please enter title for copied text");
     console.log("comment", comment, msg.selectionText, comment);
-    if (!comment) {
-      sendResponse({});
-      return;
-    }
+    // if (!comment) {
+    //   return;
+    // }
     const data = getPageData();
 
     setValueToStorage(
@@ -49,7 +50,7 @@ chrome.runtime.onMessage.addListener(async (msg, info, sendResponse) => {
     }
     deleteBookmark({ type: isTxt ? "TXT" : "YT", id });
   }
-  sendResponse({ a: "b" });
+  // sendResponse({ a: "b" });
 });
 
 const sleep = (time) => new Promise((res) => setTimeout(res, time));
@@ -112,6 +113,7 @@ async function deleteBookmark({ type, id }) {
     const res = await fetch(
       `${serverUrl}/app/${type.toLowerCase()}/${encodeURIComponent(id)}`,
       {
+        mode:"no-cors",
         method: "delete",
         headers: { "content-type": "application/json" },
       }

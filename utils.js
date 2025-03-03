@@ -1,5 +1,7 @@
-const url = "https://yt-timestamp.onrender.com";
-// const url = "http://localhost:10000";
+// const url = "https://yt-timestamp.onrender.com";
+const url = "https://yt-timestamp-py.onrender.com";
+
+// const url = "http://localhost:3000";
 const YT_PREFIX = "YT-";
 export const getCurrentActiveTab = async () => {
   let queryOptions = { active: true, lastFocusedWindow: true };

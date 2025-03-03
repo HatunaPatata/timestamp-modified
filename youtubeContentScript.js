@@ -5,8 +5,9 @@
   const currentVideoData = {};
   let bookmarkTitle = "";
   const YT_PREFIX = "YT-";
-  // const url = "http://localhost:10000";
-  const url = "https://yt-timestamp.onrender.com";
+  // const url = "http://localhost:3000";
+  const url = "https://yt-timestamp-py.onrender.com";
+  // const url = "https://yt-timestamp.onrender.com";
   console.log("url", url);
   let timerId = 0;
   // listner for all emit messages
@@ -287,6 +288,7 @@
     try {
       const res = await fetch(`${url}/app/hook/yt`, {
         method: "post",
+        mode:"no-cors",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(data),
       });
